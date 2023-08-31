@@ -2,9 +2,7 @@ package lk.media.com.mynote;
 
 import android.database.Cursor;
 
-import android.widget.ListView;
 import android.widget.ArrayAdapter;
-import java.util.ArrayList;
 
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,150 +10,89 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Toast;
 
-
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
     private EditText editTextTitle;
     private EditText editTextContent;
-    EditText editTextMemo;
-    Button buttonSave;
+    private EditText editTextMemo;
+    private Button buttonSave;
+    private ListView listViewMemos;
 
-    ListView listViewMemos;
-    ArrayAdapter<String> adapter;
-    ArrayList<String> memoList;
-    MemoDatabaseHelper mDatabaseHelper;
+    private ArrayAdapter<String> adapter;
+    private ArrayList<String> memoList;
+    private MemoDatabaseHelper mDatabaseHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main);  // この行は条件分岐の外に出して、activity_mainを常にセットします
 
-        editTextContent = findViewById(R.id.editTextContent);
-        editTextTitle = findViewById(R.id.editTextTitle);
-        editTextMemo = findViewById(R.id.editTextMemo);
-        buttonSave = findViewById(R.id.buttonSave);
-        listViewMemos = findViewById(R.id.listViewMemos);
 
-        // FloatingActionButtonのリファレンスを取得
+        mDatabaseHelper = new MemoDatabaseHelper(this);
+        memoList = mDatabaseHelper.getAllMemos();
+
+        if (memoList.size() > 0) {
+            setContentView(R.layout.activity_main);
+
+
+            editTextTitle = findViewById(R.id.editTextNewMemoTitle);
+            editTextContent = findViewById(R.id.editTextNewMemoContent);
+            buttonSave = findViewById(R.id.buttonCreateNewMemo);
+            listViewMemos = findViewById(R.id.listViewMemos);  // activity_main.xmlにこのIDを追加する必要があります
+
+            adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, memoList);
+            listViewMemos.setAdapter(adapter);
+
+            buttonSave.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    saveMemo();
+                }
+            });
+
+        } else {
+            setContentView(R.layout.activity_new_memo);
+            editTextMemo = findViewById(R.id.editTextNewMemoContent);
+        }
+
         com.google.android.material.floatingactionbutton.FloatingActionButton fabAddMemo = findViewById(R.id.fabAddMemo);
-
-        // クリックリスナーを設定
         fabAddMemo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // ここにメモの新規作成に関連するアクションを書く
-                // 例：新しいアクティビティに移動する、ダイアログを表示するなど
+                // 新規メモ作成処理
             }
         });
 
-        mDatabaseHelper = new MemoDatabaseHelper(this);
+        refreshListView();
+    }
 
-        memoList = mDatabaseHelper.getAllMemos(); // mDatabaseHelperを使用する
-
+    private void refreshListView() {
+        memoList = mDatabaseHelper.getAllMemos();
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, memoList);
         listViewMemos.setAdapter(adapter);
-
-        buttonSave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                saveMemo();
-            }
-        });
     }
 
-    private void toastMessage(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-    }
-
-private void saveMemo() {
-    String title = editTextTitle.getText().toString();
-    String content = editTextContent.getText().toString();
-    if (!title.isEmpty() && !content.isEmpty()) {
-        // AddData(title, content);  // このメソッドの中でmDatabaseHelperを使っている場合、それも変更が必要です。
-        mDatabaseHelper.addData(title, content);  // この行は仮定に基づいています。正確なメソッド名やパラメータに注意してください。
-
-        editTextTitle.setText("");
-        editTextContent.setText("");
-    } else {
-        toastMessage("タイトルと内容を入力してください");
-    }
-
-    Cursor data = mDatabaseHelper.getData();  // この行を変更しました
-    ArrayList<String> listData = new ArrayList<>();
-    while (data.moveToNext()) {
-        listData.add(data.getString(1));
-    }
-
-    String memo = editTextMemo.getText().toString();
-    if (!memo.isEmpty()) {
-        mDatabaseHelper.addMemo(memo);  // この行を変更しました
-        memoList.add(memo);
-        adapter.notifyDataSetChanged();
-        editTextMemo.setText("");
-        Toast.makeText(this, "メモを保存しました", Toast.LENGTH_SHORT).show();
-    }
-}
-
-
-
-/***
     private void saveMemo() {
-
         String title = editTextTitle.getText().toString();
         String content = editTextContent.getText().toString();
         if (!title.isEmpty() && !content.isEmpty()) {
-            AddData(title, content);
+            mDatabaseHelper.addData(title, content);
             editTextTitle.setText("");
             editTextContent.setText("");
+            memoList.add(title);
+            adapter.notifyDataSetChanged();
         } else {
             toastMessage("タイトルと内容を入力してください");
         }
-
-        Cursor data = mDatabaseHelper.getData();
-        ArrayList<String> listData = new ArrayList<>();
-        while (data.moveToNext()) {
-            listData.add(data.getString(1));  // タイトルのカラムのデータのみ追加
-        }
-
-
-
-        String memo = editTextMemo.getText().toString();
-        if (!memo.isEmpty()) {
-            databaseHelper.addMemo(memo);
-            memoList.add(memo);
-            adapter.notifyDataSetChanged();
-            editTextMemo.setText("");
-            Toast.makeText(this, "メモを保存しました", Toast.LENGTH_SHORT).show();
-        }
-    }
- ***/
-
-    /** 追加２
-    public void AddData(String title, String content) {
-        boolean isInserted = mDatabaseHelper.addData(title, content);
-        if (isInserted) {
-            toastMessage("メモが保存されました");
-        } else {
-            toastMessage("メモの保存に失敗しました");
-        }
+        refreshListView();
     }
 
     private void toastMessage(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
-
-    /** 追加２ ここまで **/
-
 }
-
-
-/***
-    private void loadMemo() {
-        String memo = getSharedPreferences("memo_app", MODE_PRIVATE).getString("memo_key", "");
-        editTextMemo.setText(memo);
-    }
-} ***/
-

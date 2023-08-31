@@ -4,46 +4,52 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="16dp"
     tools:context=".MainActivity">
 
+    <TextView
+        android:id="@+id/textViewPrompt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="新しいメモを作成してください"
+        android:textSize="18sp"
+        android:layout_centerHorizontal="true"/>
+
+    <EditText
+        android:id="@+id/editTextNewMemoTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/textViewPrompt"
+        android:layout_marginTop="32dp"
+        android:hint="タイトル"/>
+
+    <EditText
+        android:id="@+id/editTextNewMemoContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/editTextNewMemoTitle"
+        android:layout_marginTop="16dp"
+        android:hint="内容"
+        android:inputType="textMultiLine"
+        android:lines="4"/>
+
+    <Button
+        android:id="@+id/buttonCreateNewMemo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/editTextNewMemoContent"
+        android:layout_marginTop="32dp"
+        android:layout_centerHorizontal="true"
+        android:text="保存"/>
+
+    <!-- 追加：ListView -->
     <ListView
         android:id="@+id/listViewMemos"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_above="@+id/editTextTitle"
-        android:layout_weight="1" />
-
-    <EditText
-        android:id="@+id/editTextTitle"
-        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/editTextContent"
-        android:hint="メモのタイトル" />
-
-    <EditText
-        android:id="@+id/editTextContent"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/editTextMemo"
-        android:hint="メモの内容" />
-
-    <EditText
-        android:id="@+id/editTextMemo"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:layout_above="@+id/buttonSave"
-        android:gravity="top|start"
-        android:inputType="textMultiLine"
-        android:hint=""
-        android:padding="16dp" />
-
-    <Button
-        android:id="@+id/buttonSave"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/fabAddMemo"
-        android:text="保存" />
+        android:layout_below="@id/buttonCreateNewMemo"
+        android:layout_marginTop="32dp">
+    </ListView>
 
     <!-- 新規作成ボタン -->
     <com.google.android.material.floatingactionbutton.FloatingActionButton

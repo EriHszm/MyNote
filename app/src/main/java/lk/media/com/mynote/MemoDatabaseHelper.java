@@ -24,35 +24,18 @@ MemoDatabaseHelper extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
-    /*** @Override
-    public void onCreate(SQLiteDatabase db) {
-        String createTableStatement = "CREATE TABLE " + TABLE_MEMOS + " (" +
-                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                COLUMN_TITLE + " TEXT, " +
-                COLUMN_CONTENT + " TEXT)";
-/*
-        String createTable = "CREATE TABLE " + TABLE_NAME + " (" +
-                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                COLUMN_MEMO + " TEXT)";
-
-        db.execSQL(createTable);
-    }
-    ***/
-
     @Override
-    /*追加コード　ここから*/
     public void onCreate(SQLiteDatabase db) {
         String createTable = "CREATE TABLE " + TABLE_NAME + " (ID INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COL2 +" TEXT, " + COL3 +" TEXT)";
         db.execSQL(createTable);
     }
-    /*追加コード　ここまで*/
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         onCreate(db);
     }
-    /*追加コード　ここから*/
+
     public boolean addData(String title, String content) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
@@ -63,7 +46,6 @@ MemoDatabaseHelper extends SQLiteOpenHelper {
 
         return result != -1;
     }
-    /*追加コード　ここまで*/
 
     public ArrayList<String> getAllMemos() {
         ArrayList<String> memoList = new ArrayList<>();
@@ -72,20 +54,15 @@ MemoDatabaseHelper extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery(selectQuery, null);
         if (cursor.moveToFirst()) {
             do {
-                memoList.add(cursor.getString(cursor.getColumnIndex(COL3)));
+                String title = cursor.getString(cursor.getColumnIndex(COL2));
+                // String content = cursor.getString(cursor.getColumnIndex(COL3)); // If you need the content
+                memoList.add(title); // You can also append content here if needed
             } while (cursor.moveToNext());
         }
         cursor.close();
         return memoList;
     }
 
-    public void addMemo(String memo) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(COL3, memo);
-        db.insert(TABLE_NAME, null, values);
-        db.close();
-    }
 
     public Cursor getData() {
         SQLiteDatabase db = this.getWritableDatabase();
